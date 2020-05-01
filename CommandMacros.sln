@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandMacros", "CommandMacros.csproj", "{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|anycpu = Debug|anycpu
+		Release|anycpu = Release|anycpu
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}.Debug|anycpu.ActiveCfg = Debug|Any CPU
+		{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}.Debug|anycpu.Build.0 = Debug|Any CPU
+		{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}.Release|anycpu.ActiveCfg = Release|Any CPU
+		{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}.Release|anycpu.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
