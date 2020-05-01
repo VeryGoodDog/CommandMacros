@@ -2,8 +2,9 @@
 CommandMacros is a simple mod that allows you to do more, faster!
 
 Currently, it only lets you register command aliases with the client command `.commandalias`.
-However, there are more features planned:
-- Multiple commands run per alias.
+You can run multiple commands per alias, `.commandalias new test .help;.recordingmode` will run `.help` followed by `.recordingmode`.
+
+### Planned Features
 - Arguments supplied via alias.
 - Improved in macro system.
 	- Toggles.

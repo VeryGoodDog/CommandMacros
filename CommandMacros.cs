@@ -7,81 +7,66 @@ using Vintagestory.API.Common;
 namespace CommandMacros {
 	public class CommandMacrosMod : ModSystem {
 		internal ICoreClientAPI ClientAPI;
-		public IClientEventAPI EventAPI;
-		public ILogger Logger;
+		internal IClientEventAPI EventAPI;
+		internal ILogger Logger;
 		public IClientPlayer Player;
-		public AliasCommandler Commandler;
+		public AliasCommandler AliasCommler;
+		public CommandMacrosConfig Configs;
 
+		public static string ConfigPath = Path.Combine("commandmacros.json");
 
-		public override bool ShouldLoad(EnumAppSide forSide) {
-			return forSide.IsClient();
-		}
+		public override bool ShouldLoad(EnumAppSide forSide) => forSide.IsClient();
 
 		public override void StartClientSide(ICoreClientAPI api) {
 			ClientAPI = api;
 			EventAPI = ClientAPI.Event;
 			Logger = ClientAPI.Logger;
 
-			Logger.VerboseDebug("CommandMacros Present!");
-			Dictionary<string, Alias> conf;
+			//Logger.VerboseDebug("CommandMacros Present!");
 			try {
-				conf = LoadConfig();
+				Configs = LoadConfig();
 			} catch (Exception) {
-				conf = null;
+				Logger.Warning("CommandMacros config failed to load!");
 			}
-			if (conf == null) Logger.Warning("CommandMacros config failed to load!");
-			Commandler = new AliasCommandler(this, conf);
-			ClientAPI.RegisterCommand(Commandler);
 
-			EventAPI.LevelFinalize += Initialize;
+			Configs ??= new CommandMacrosConfig();
+
+			//AliasDict = Configs.AliasDict;
+			AliasCommler = new AliasCommandler(this, Configs.aliases);
+			ClientAPI.RegisterCommand(AliasCommler);
+
+			EventAPI.LevelFinalize += () => {
+				Logger.VerboseDebug("Initializing CommandMacros!");
+				Player = ClientAPI.World.Player;
+				EventAPI.OnSendChatMessage += HandleMessage;
+			};
 
 			EventAPI.LeaveWorld += () => {
-				SaveConfig(Commandler.AliasDict);
+				SaveConfig(Configs);
 				Logger.Debug("Saved CM config.");
 			};
 			base.StartClientSide(api);
 		}
 
-		private Dictionary<string, Alias> LoadConfig() {
-			var reloaded = ClientAPI.LoadModConfig<List<Alias>>(
-				Path.Combine(ClientAPI.DataBasePath, "SuperMacros", "macros.json")
+		private CommandMacrosConfig LoadConfig() =>
+			ClientAPI.LoadModConfig<CommandMacrosConfig>(
+				ConfigPath
 			);
 
-			var dict = new Dictionary<string, Alias>(StringComparer.Ordinal);
-			foreach (var el in reloaded) {
-				dict.Add(el.trigger, el);
-			}
-			return dict;
-		}
-
-		private void SaveConfig(Dictionary<string, Alias> config) {
-			var list = new List<Alias>();
-			foreach (var kvp in config) {
-				list.Add(kvp.Value);
-			}
-			// ready to save!
-			ClientAPI.StoreModConfig<List<Alias>>(
-				list,
-				Path.Combine(ClientAPI.DataBasePath, "SuperMacros", "macros.json")
+		private void SaveConfig(CommandMacrosConfig conf) =>
+			ClientAPI.StoreModConfig(
+				conf,
+				ConfigPath
 			);
-		}
-
-		private void Initialize() {
-			Logger.VerboseDebug("Initialize fired!");
-			Player = ClientAPI.World.Player;
-			EventAPI.OnSendChatMessage += HandleMessage;
-		}
-
-
 
 		private void HandleMessage(int groupId, ref string message, ref EnumHandling handled) {
 			// if it doesnt start with a "." then its not a command.
 			if (!message.StartsWith(".")) return;
 
 			var trig = message.Substring(1);
-			if (!Commandler.Has(trig)) return; // make sure it exists!
-											   //Logger.Debug(message);
-			Commandler.TriggerAlias(trig);
+			if (!Configs.aliases.Has(trig)) return; // make sure it exists!
+															  
+			Configs.aliases.Get(trig).Execute(ClientAPI);
 			// this prevents the "Command foo not found" from appearing
 			handled = EnumHandling.PreventDefault;
 		}

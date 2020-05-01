@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 
 namespace CommandMacros {
 
-	public struct Alias {
-		public string trigger;
-		public string command;
-
-		public void Execute(ICoreClientAPI api) {
-			api.TriggerChatMessage(command);
-		}
-
-		public override string ToString() {
-			return $"{trigger}: {command}";
-		}
-	}
-
 	public class AliasCommandler : ClientChatCommand {
 
 		private readonly CommandMacrosMod Mod;
 		private readonly ICoreClientAPI ClientAPI;
-		internal readonly Dictionary<string, Alias> AliasDict;
+		internal readonly List<Alias> AliasList;
 
-		public AliasCommandler(CommandMacrosMod mod, Dictionary<string, Alias> list = null) {
+		/// <summary>
+		/// Create the command, a command handler... a Commandler, if you will. 
+		/// </summary>
+		/// <param name="mod"></param>
+		/// <param name="list">Alias list to keep a reference.</param>
+		public AliasCommandler(CommandMacrosMod mod, List<Alias> list) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
 			Syntax = "[new|edit|delete|list]";
@@ -32,7 +25,7 @@ namespace CommandMacros {
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
 
-			AliasDict = list ?? new Dictionary<string, Alias>(StringComparer.Ordinal);
+			AliasList = list;
 		}
 
 		public override void CallHandler(IPlayer player, int groupId, CmdArgs args) {
@@ -46,6 +39,7 @@ namespace CommandMacros {
 
 			switch (opt) {
 				case "new":
+				case "add":
 				case "n":
 					CommandNew(args);
 					break;
@@ -68,67 +62,75 @@ namespace CommandMacros {
 			}
 		}
 
+		/// <summary>
+		/// Create a new alias.
+		/// </summary>
+		/// <param name="args"></param>
 		private void CommandNew(CmdArgs args) {
 			if (args.Length < 2) {
 				ClientAPI.ShowChatMessage("You must specify at least 2 arguments.");
 				return;
 			}
 			var trigger = args.PopWord();
-			if (Has(trigger)) {
+			if (AliasList.Has(trigger)) {
 				ClientAPI.ShowChatMessage("That alias already exists.");
 				return;
 			}
+
 			var al = new Alias {
 				trigger = trigger,
-				command = args.PopAll()
+				commands = args.PopAll().Split(';')
 			};
-			AliasDict.Add(trigger, al);
-			ClientAPI.ShowChatMessage($"Created the alias \"{al}\"!");
+			AliasList.Add(al);
+			ClientAPI.ShowChatMessage($"Created an alias for \".{trigger}\"!");
 		}
 
+		/// <summary>
+		/// Edits an alias.
+		/// </summary>
+		/// <param name="args"></param>
 		private void CommandEdit(CmdArgs args) {
 			if (args.Length < 2) {
 				ClientAPI.ShowChatMessage("You must specify at least 2 arguments.");
 				return;
 			}
 			var toEdit = args.PopWord();
-			if (!Has(toEdit)) {
+			if (!AliasList.Has(toEdit)) {
 				ClientAPI.ShowChatMessage($"No such alias {toEdit}");
 			}
 
-			AliasDict[toEdit] = new Alias {
+			AliasList.Set(toEdit, new Alias {
 				trigger = toEdit,
-				command = args.PopAll()
-			};
-			ClientAPI.ShowChatMessage($"Updated alias to \"{AliasDict[toEdit]}\"!");
+				commands = args.PopAll().Split(';')
+			});
+			ClientAPI.ShowChatMessage($"Updated alias to \"{AliasList.Get(toEdit)}\"!");
 		}
 
+		/// <summary>
+		/// Deletes and alias.
+		/// </summary>
+		/// <param name="args"></param>
 		private void CommandDelete(CmdArgs args) {
 			var trigger = args.PopWord();
-			var worked = AliasDict.Remove(trigger);
+			var worked = AliasList.Remove(trigger);
 			if (!worked)
 				ClientAPI.ShowChatMessage($"Failed to delete alias {trigger}");
 			else
 				ClientAPI.ShowChatMessage($"Deleted alias {trigger}");
 		}
 
+		/// <summary>
+		/// Lists aliases, or prints one alias.
+		/// </summary>
+		/// <param name="args"></param>
 		private void CommandList(CmdArgs args) {
-			if (args.Length != 0 && Has(args.PeekWord())) {
+			if (args.Length != 0 && AliasList.Has(args.PeekWord())) {
 				ClientAPI.ShowChatMessage("You have an alias:");
-				ClientAPI.ShowChatMessage(AliasDict[args.PeekWord()].ToString());
+				ClientAPI.ShowChatMessage(AliasList.Get(args.PeekWord()).ToString());
 				return;
 			}
-			ClientAPI.ShowChatMessage($"You have {AliasDict.Count} aliases:");
-			foreach (var al in AliasDict) {
-				ClientAPI.ShowChatMessage(al.Value.ToString());
-			}
-		}
-
-		public bool Has(string trigger) => AliasDict.ContainsKey(trigger);
-
-		public void TriggerAlias(string trigger) {
-			AliasDict[trigger].Execute(ClientAPI);
-			//ClientAPI.SendChatMessage(".help");
+			ClientAPI.ShowChatMessage($"You have {AliasList.Count} aliases:");
+			AliasList.ForEach((al) => ClientAPI.ShowChatMessage(al.ToString()));
 		}
 
 		public override string GetDescription() => base.GetDescription();
