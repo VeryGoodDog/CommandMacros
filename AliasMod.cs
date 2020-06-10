@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.Common;
 
 namespace CommandMacros {
-	public class CommandMacrosMod : ModSystem {
+	public class AliasMod : ModSystem {
 		internal ICoreClientAPI ClientAPI;
 		internal IClientEventAPI EventAPI;
 		internal ILogger Logger;
@@ -13,7 +14,7 @@ namespace CommandMacros {
 		public AliasCommandler AliasCommler;
 		public CommandMacrosConfig Configs;
 
-		public static string ConfigPath = Path.Combine("commandmacros.json");
+		public static string ConfigPath = Path.Combine("cmaliases.json");
 
 		public override bool ShouldLoad(EnumAppSide forSide) => forSide.IsClient();
 
@@ -21,29 +22,29 @@ namespace CommandMacros {
 			ClientAPI = api;
 			EventAPI = ClientAPI.Event;
 			Logger = ClientAPI.Logger;
-
-			//Logger.VerboseDebug("CommandMacros Present!");
+			
 			try {
 				Configs = LoadConfig();
 			} catch (Exception) {
-				Logger.Warning("CommandMacros config failed to load!");
+				Logger.Warning("alias config failed to load!");
 			}
 
 			Configs ??= new CommandMacrosConfig();
 
-			//AliasDict = Configs.AliasDict;
+			Configs.aliases.Init(ClientAPI);
+
 			AliasCommler = new AliasCommandler(this, Configs.aliases);
 			ClientAPI.RegisterCommand(AliasCommler);
 
 			EventAPI.LevelFinalize += () => {
-				Logger.VerboseDebug("Initializing CommandMacros!");
+				Logger.VerboseDebug("Initializing aliases!");
 				Player = ClientAPI.World.Player;
-				EventAPI.OnSendChatMessage += HandleMessage;
 			};
 
 			EventAPI.LeaveWorld += () => {
+
 				SaveConfig(Configs);
-				Logger.Debug("Saved CM config.");
+				Logger.Debug("Saved alias config.");
 			};
 			base.StartClientSide(api);
 		}
@@ -58,18 +59,6 @@ namespace CommandMacros {
 				conf,
 				ConfigPath
 			);
-
-		private void HandleMessage(int groupId, ref string message, ref EnumHandling handled) {
-			// if it doesnt start with a "." then its not a command.
-			if (!message.StartsWith(".")) return;
-
-			var trig = message.Substring(1);
-			if (!Configs.aliases.Has(trig)) return; // make sure it exists!
-															  
-			Configs.aliases.Get(trig).Execute(ClientAPI);
-			// this prevents the "Command foo not found" from appearing
-			handled = EnumHandling.PreventDefault;
-		}
 	}
 }
 

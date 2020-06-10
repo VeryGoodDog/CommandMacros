@@ -59,7 +59,7 @@
     </Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="CommandMacros.cs" />
+		<Compile Include="AliasMod.cs" />
 		<Compile Include="Properties\AssemblyInfo.cs" />
 		<Compile Include="SuperMacroCommandler.cs" />
 		<Compile Include="AliasCommandler.cs" />

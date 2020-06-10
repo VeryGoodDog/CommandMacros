@@ -14,6 +14,4 @@ You can run multiple commands per alias, `.commandalias new test .help;.recordin
 
 Because this is still in development, there is probably going to be a lot of breaking changes.
 
-See the zip folder for usable builds!
-
 If you want to build this yourself, you will need to change the Reference locations in `CommandMacros.csproj`.

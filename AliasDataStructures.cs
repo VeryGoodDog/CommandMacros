@@ -1,12 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 
 namespace CommandMacros {
-	public struct Alias {
+	public class Alias {
 		public string trigger;
 		public string[] commands;
+
+		public Alias(string tr, string[] coms) {
+			var noFind = tr + " ";
+			commands = coms.Where((c) => c.IndexOf(noFind) != 0).ToArray();
+			trigger = tr;
+		}
 
 		public override bool Equals(object obj) {
 			return obj is Alias alias &&
@@ -14,13 +23,10 @@ namespace CommandMacros {
 				   EqualityComparer<string[]>.Default.Equals(commands, alias.commands);
 		}
 
-		/// <summary>
-		/// Execute every command in the alias list.
-		/// </summary>
-		/// <param name="api"></param>
-		public void Execute(ICoreClientAPI api) {
-			foreach (var com in commands)
-				api.TriggerChatMessage(com);
+		internal void Execute(ICoreClientAPI api) {
+			for (int i = 0; i < commands.Length; i++) {
+				api.TriggerChatMessage(commands[i]);
+			}
 		}
 
 		public override int GetHashCode() {
@@ -42,23 +48,70 @@ namespace CommandMacros {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// compares a string and an aliases trigger.
+		/// </summary>
+		/// <param name="al"></param>
+		/// <param name="tr"></param>
+		/// <returns></returns>
 		public static bool operator ==(Alias al, string tr) => al.trigger == tr;
 
+		/// <summary>
+		/// compares two aliases.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator ==(Alias left, Alias right) => left.Equals(right);
 
+		/// <summary>
+		/// compares string and alias.
+		/// </summary>
+		/// <param name="al"></param>
+		/// <param name="tr"></param>
+		/// <returns>true if not equal</returns>
 		public static bool operator !=(Alias al, string tr) => al.trigger != tr;
 
 		public static bool operator !=(Alias left, Alias right) => !(left == right);
 	}
 
-	public static class AliasListExtentions {
-		public static bool Has(this List<Alias> l, string trigger) =>
-			l.Exists((al) => al == trigger);
-		public static Alias Get(this List<Alias> l, string trigger) =>
-			l.Find((al) => al == trigger);
-		public static void Set(this List<Alias> l, string trigger, Alias toSet) =>
-			l[l.FindIndex((al) => al == trigger)] = toSet;
-		public static bool Remove(this List<Alias> l, string trigger) =>
-			l.Remove(l.Find((al) => al == trigger));
+	public class AliasList : KeyedCollection<string, Alias> {
+
+		private ICoreClientAPI ClientAPI = null;
+
+		/// <summary>
+		/// Must be called before adding any commands.
+		/// </summary>
+		/// <param name="api"></param>
+		internal void Init(ICoreClientAPI api) {
+			ClientAPI = api;
+		}
+
+		public void AddOrUpdate(Alias al) {
+			if (!Contains(al.trigger))
+			{
+				var t = al.trigger;
+				ClientAPI.RegisterCommand(t, "Alias", "", (group, args) => {
+					this[t]?.Execute(ClientAPI);
+				});
+			}
+			Remove(al.trigger);
+			Add(al);
+		}
+
+		internal void InitAllAliases() {
+			for (int i = 0; i < Count; i++) {
+				var t = this[i].trigger;
+				ClientAPI.RegisterCommand(t, "Alias", "", (group, args) => {
+					this[t]?.Execute(ClientAPI);
+				});
+			}
+		}
+
+		public override string ToString() {
+			return base.ToString();
+		}
+
+		protected override string GetKeyForItem(Alias item) => item.trigger;
 	}
 }

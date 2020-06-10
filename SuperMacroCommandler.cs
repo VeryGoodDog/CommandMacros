@@ -4,10 +4,10 @@ using Vintagestory.API.Common;
 namespace CommandMacros {
 	public class SuperMacroCommandler : ClientChatCommand {
 
-		private CommandMacrosMod Mod;
+		private AliasMod Mod;
 		private ICoreClientAPI ClientAPI;
 
-		public SuperMacroCommandler(CommandMacrosMod mod) {
+		public SuperMacroCommandler(AliasMod mod) {
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
 			Command = "supermacro";
