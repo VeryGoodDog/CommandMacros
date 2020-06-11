@@ -95,9 +95,11 @@ namespace CommandMacros {
 					this[t]?.Execute(ClientAPI);
 				});
 			}
-			Remove(al.trigger);
+			Remove(al);
 			Add(al);
 		}
+
+		public new bool Remove(Alias al) => Remove(al.trigger);
 
 		internal void InitAllAliases() {
 			for (int i = 0; i < Count; i++) {
@@ -106,10 +108,6 @@ namespace CommandMacros {
 					this[t]?.Execute(ClientAPI);
 				});
 			}
-		}
-
-		public override string ToString() {
-			return base.ToString();
 		}
 
 		protected override string GetKeyForItem(Alias item) => item.trigger;
