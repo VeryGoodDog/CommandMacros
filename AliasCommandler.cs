@@ -10,22 +10,23 @@ namespace CommandMacros {
 
 		private readonly AliasMod Mod;
 		private readonly ICoreClientAPI ClientAPI;
-		internal readonly AliasList Aliases;
+		internal readonly AliasManager Aliases;
 
 		/// <summary>
 		/// Create the command, a command handler... a Commandler, if you will. 
 		/// </summary>
 		/// <param name="mod"></param>
 		/// <param name="list">Alias list to keep a reference.</param>
-		public AliasCommandler(AliasMod mod, AliasList list) {
+		public AliasCommandler(AliasMod mod, AliasManager list) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
 			Syntax = "[new|delete|list]";
 
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
-
 			Aliases = list;
+
+			Aliases.InitAllAliases(ClientAPI);
 		}
 
 		public override void CallHandler(IPlayer player, int groupId, CmdArgs args) {
@@ -70,10 +71,10 @@ namespace CommandMacros {
 				return;
 			}
 			var trigger = args.PopWord();
-			var al = new Alias(
-				trigger,
-				args.PopAll().Split(';')
-			);
+			var al = new Alias() {
+				trigger = trigger,
+				commands = args.PopAll().Split(';')
+			};
 			Aliases.AddOrUpdate(al);
 			ClientAPI.ShowChatMessage($"Created or edited an alias for {trigger}!");
 		}
@@ -115,5 +116,13 @@ namespace CommandMacros {
 		public override string GetHelpMessage() => base.GetHelpMessage();
 
 		public override string GetSyntax() => base.GetSyntax();
+
+		internal List<Alias> GetManagerAsList() {
+			var aliases = new List<Alias>(Aliases.Count);
+			for (int i = 0; i < Aliases.Count; i++) {
+				aliases.Add(Aliases[i]);
+			}
+			return aliases;
+		}
 	}
 }

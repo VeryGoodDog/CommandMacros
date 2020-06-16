@@ -64,7 +64,8 @@
 		<Compile Include="SuperMacroCommandler.cs" />
 		<Compile Include="AliasCommandler.cs" />
 		<Compile Include="Configs.cs" />
-		<Compile Include="AliasDataStructures.cs" />
+		<Compile Include="AliasManager.cs" />
+		<Compile Include="Alias.cs" />
 	</ItemGroup>
   <ItemGroup>
 		<None Include="modinfo.json">

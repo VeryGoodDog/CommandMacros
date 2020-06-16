@@ -12,7 +12,7 @@ namespace CommandMacros {
 		internal ILogger Logger;
 		public IClientPlayer Player;
 		public AliasCommandler AliasCommler;
-		public CommandMacrosConfig Configs;
+		public AliasConfig Configs;
 
 		public static string ConfigPath = Path.Combine("cmaliases.json");
 
@@ -22,18 +22,19 @@ namespace CommandMacros {
 			ClientAPI = api;
 			EventAPI = ClientAPI.Event;
 			Logger = ClientAPI.Logger;
-			
+
 			try {
 				Configs = LoadConfig();
-			} catch (Exception) {
+			} catch (Exception e) {
 				Logger.Warning("alias config failed to load!");
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.Source);
+				Console.WriteLine(e.ToString());
 			}
 
-			Configs ??= new CommandMacrosConfig();
+			Configs ??= new AliasConfig();
 
-			Configs.aliases.Init(ClientAPI);
-
-			AliasCommler = new AliasCommandler(this, Configs.aliases);
+			AliasCommler = new AliasCommandler(this, Configs.AsAliasManager());
 			ClientAPI.RegisterCommand(AliasCommler);
 
 			EventAPI.LevelFinalize += () => {
@@ -42,23 +43,26 @@ namespace CommandMacros {
 			};
 
 			EventAPI.LeaveWorld += () => {
-
+				Configs.aliases = AliasCommler.GetManagerAsList();
+				Console.WriteLine(Configs.aliases.Count);
 				SaveConfig(Configs);
 				Logger.Debug("Saved alias config.");
 			};
 			base.StartClientSide(api);
 		}
 
-		private CommandMacrosConfig LoadConfig() =>
-			ClientAPI.LoadModConfig<CommandMacrosConfig>(
+		private AliasConfig LoadConfig() {
+			return ClientAPI.LoadModConfig<AliasConfig>(
 				ConfigPath
 			);
+		}
 
-		private void SaveConfig(CommandMacrosConfig conf) =>
+		private void SaveConfig(AliasConfig conf) {
 			ClientAPI.StoreModConfig(
 				conf,
 				ConfigPath
 			);
+		}
 	}
 }
 

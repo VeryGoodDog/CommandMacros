@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Vintagestory.API.Client;
-using Vintagestory.API.Common;
 
 namespace CommandMacros {
 	public class Alias {
@@ -15,6 +12,11 @@ namespace CommandMacros {
 			var noFind = tr + " ";
 			commands = coms.Where((c) => c.IndexOf(noFind) != 0).ToArray();
 			trigger = tr;
+		}
+
+		public Alias() {
+			trigger = null;
+			commands = null;
 		}
 
 		public override bool Equals(object obj) {
@@ -73,43 +75,5 @@ namespace CommandMacros {
 		public static bool operator !=(Alias al, string tr) => al.trigger != tr;
 
 		public static bool operator !=(Alias left, Alias right) => !(left == right);
-	}
-
-	public class AliasList : KeyedCollection<string, Alias> {
-
-		private ICoreClientAPI ClientAPI = null;
-
-		/// <summary>
-		/// Must be called before adding any commands.
-		/// </summary>
-		/// <param name="api"></param>
-		internal void Init(ICoreClientAPI api) {
-			ClientAPI = api;
-		}
-
-		public void AddOrUpdate(Alias al) {
-			if (!Contains(al.trigger))
-			{
-				var t = al.trigger;
-				ClientAPI.RegisterCommand(t, "Alias", "", (group, args) => {
-					this[t]?.Execute(ClientAPI);
-				});
-			}
-			Remove(al);
-			Add(al);
-		}
-
-		public new bool Remove(Alias al) => Remove(al.trigger);
-
-		internal void InitAllAliases() {
-			for (int i = 0; i < Count; i++) {
-				var t = this[i].trigger;
-				ClientAPI.RegisterCommand(t, "Alias", "", (group, args) => {
-					this[t]?.Execute(ClientAPI);
-				});
-			}
-		}
-
-		protected override string GetKeyForItem(Alias item) => item.trigger;
 	}
 }
