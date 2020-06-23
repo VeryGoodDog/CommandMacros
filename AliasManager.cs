@@ -14,7 +14,6 @@ namespace CommandMacros {
 		public bool hasClient = false;
 		public bool allBound = false;
 		public bool IsReady => hasClient && allBound;
-		
 
 		/// <summary>
 		/// Must be called before adding any commands.
@@ -26,18 +25,43 @@ namespace CommandMacros {
 		}
 
 		public void AddOrUpdate(Alias al) {
-			if (!IsReady) return;
 			RegisterTrigger(al.trigger);
 			Remove(al);
 			Add(al);
 		}
 
 		private void RegisterTrigger(string trigger) {
-			if (!allTriggers.Contains(trigger)) {
-				ClientAPI.RegisterCommand(trigger, "Alias command", "", (group, args) => {
-					this[trigger]?.Execute(ClientAPI);
-				});
-				allTriggers.Add(trigger);
+			if (allTriggers.Contains(trigger)) return;
+			ClientAPI.RegisterCommand(trigger, "Alias command", "", (group, args) => {
+				var al = this[trigger];
+				if (al is null) return;
+				var allArgs = args.PopAllAsArray();
+				AliasCommand(al, allArgs);
+			});
+			allTriggers.Add(trigger);
+
+		}
+
+		/// <summary>
+		/// this is what does the majority of the hard work.
+		/// </summary>
+		/// <param name="al">the alias</param>
+		/// <param name="args">the command line args</param>
+		public void AliasCommand(Alias al, string[] args) {
+			var comms = al.commands;
+			var injectedComms = new string[comms.Length];
+			try {
+				for (int i = 0; i < comms.Length; i++) {
+					var line = comms[i];
+					injectedComms[i] = string.Format(line, args);
+				}
+			} catch (FormatException) {
+				ClientAPI.ShowChatMessage("Argument injection failed. You may need more arguments.");
+				return;
+			}
+
+			for (int i = 0; i < injectedComms.Length; i++) {
+				ClientAPI.TriggerChatMessage(injectedComms[i]);
 			}
 		}
 
@@ -53,7 +77,7 @@ namespace CommandMacros {
 			} catch (Exception) {
 				allBound = false;
 			}
-			
+
 		}
 
 		protected override string GetKeyForItem(Alias item) => item.trigger;

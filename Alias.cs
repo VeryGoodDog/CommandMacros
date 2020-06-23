@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Vintagestory.API.Client;
+using Vintagestory.API.Common;
 
 namespace CommandMacros {
 	public class Alias {
@@ -23,12 +24,6 @@ namespace CommandMacros {
 			return obj is Alias alias &&
 				   trigger == alias.trigger &&
 				   EqualityComparer<string[]>.Default.Equals(commands, alias.commands);
-		}
-
-		internal void Execute(ICoreClientAPI api) {
-			for (int i = 0; i < commands.Length; i++) {
-				api.TriggerChatMessage(commands[i]);
-			}
 		}
 
 		public override int GetHashCode() {

@@ -17,16 +17,14 @@ namespace CommandMacros {
 		/// </summary>
 		/// <param name="mod"></param>
 		/// <param name="list">Alias list to keep a reference.</param>
-		public AliasCommandler(AliasMod mod, AliasManager list) {
+		public AliasCommandler(AliasMod mod) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
 			Syntax = "[new|delete|list]";
 
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
-			Aliases = list;
-
-			Aliases.InitAllAliases(ClientAPI);
+			Aliases = Mod.AliasMan;
 		}
 
 		public override void CallHandler(IPlayer player, int groupId, CmdArgs args) {
@@ -71,10 +69,10 @@ namespace CommandMacros {
 				return;
 			}
 			var trigger = args.PopWord();
-			var al = new Alias() {
-				trigger = trigger,
-				commands = args.PopAll().Split(';')
-			};
+			var al = new Alias(
+				trigger,
+				args.PopAll().Split(';')
+				);
 			Aliases.AddOrUpdate(al);
 			ClientAPI.ShowChatMessage($"Created or edited an alias for {trigger}!");
 		}

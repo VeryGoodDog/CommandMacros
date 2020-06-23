@@ -1,12 +1,18 @@
 # CommandMacros
 CommandMacros is a simple mod that allows you to do more, faster!
 
-Currently, it only lets you register command aliases with the client command `.commandalias`.
-You can run multiple commands per alias, `.commandalias new test .help;.recordingmode` will run `.help` followed by `.recordingmode`.
+### Current Features
+- Creating aliases via the `.commandalias` command. (`.commandalias` supports CRUD operations)
+`.commandalias new h .help` creates an alias for `.help` under `.h`.
+- Running multiple commands in one alias, separated by semicolons.
+`.commandalias new twothings .help;.edi`
+- Supplying arguments to an alias.
+`.commandalias new onetwo {0} {1};{1} {0}` registers `onetwo` so `.onetwo one two` prints `one two` and `two one` to chat.
 
 ### Planned Features
-- Arguments supplied via alias.
-- Improved in macro system.
+- Rest arguments.
+- A GUI for creating and editing aliases.
+- Improved macro system.
 	- Toggles.
 	- Hold to toggle.
 	- Maybe an embedded scripting language?

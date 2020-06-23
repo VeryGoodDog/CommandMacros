@@ -10,9 +10,12 @@ namespace CommandMacros {
 		internal ICoreClientAPI ClientAPI;
 		internal IClientEventAPI EventAPI;
 		internal ILogger Logger;
+		internal AliasManager AliasMan;
+
 		public IClientPlayer Player;
 		public AliasCommandler AliasCommler;
 		public AliasConfig Configs;
+
 
 		public static string ConfigPath = Path.Combine("cmaliases.json");
 
@@ -25,26 +28,25 @@ namespace CommandMacros {
 
 			try {
 				Configs = LoadConfig();
-			} catch (Exception e) {
+			} catch (Exception) {
 				Logger.Warning("alias config failed to load!");
-				Console.WriteLine(e.Message);
-				Console.WriteLine(e.Source);
-				Console.WriteLine(e.ToString());
 			}
 
 			Configs ??= new AliasConfig();
 
-			AliasCommler = new AliasCommandler(this, Configs.AsAliasManager());
+			AliasMan = Configs.AsAliasManager();
+
+			AliasCommler = new AliasCommandler(this);
 			ClientAPI.RegisterCommand(AliasCommler);
 
 			EventAPI.LevelFinalize += () => {
 				Logger.VerboseDebug("Initializing aliases!");
 				Player = ClientAPI.World.Player;
+				AliasMan.InitAllAliases(ClientAPI);
 			};
 
 			EventAPI.LeaveWorld += () => {
 				Configs.aliases = AliasCommler.GetManagerAsList();
-				Console.WriteLine(Configs.aliases.Count);
 				SaveConfig(Configs);
 				Logger.Debug("Saved alias config.");
 			};
@@ -62,6 +64,16 @@ namespace CommandMacros {
 				conf,
 				ConfigPath
 			);
+		}
+	}
+
+	public static class CmdArgsExtentions {
+		public static string[] PopAllAsArray(this CmdArgs args) {
+			var allArgs = new string[args.Length];
+			for (int i = 0; i < args.Length; i++) {
+				allArgs[i] = args[i];
+			}
+			return allArgs;
 		}
 	}
 }
