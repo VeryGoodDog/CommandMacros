@@ -10,7 +10,7 @@ namespace CommandMacros {
 
 		private readonly AliasMod Mod;
 		private readonly ICoreClientAPI ClientAPI;
-		internal readonly AliasManager Aliases;
+		internal AliasManager Aliases => Mod.AliasMan;
 
 		/// <summary>
 		/// Create the command, a command handler... a Commandler, if you will. 
@@ -20,11 +20,10 @@ namespace CommandMacros {
 		public AliasCommandler(AliasMod mod) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
-			Syntax = "[new|delete|list]";
+			Syntax = "[new|list|delete|save|load]";
 
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
-			Aliases = Mod.AliasMan;
 		}
 
 		public override void CallHandler(IPlayer player, int groupId, CmdArgs args) {
@@ -38,20 +37,19 @@ namespace CommandMacros {
 
 			switch (opt) {
 				case "new":
-				case "add":
-				case "n":
-				case "edit":
-				case "e":
 					CommandNew(args);
 					break;
 				case "list":
-				case "l":
 					CommandList(args);
 					break;
 				case "delete":
-				case "del":
-				case "d":
 					CommandDelete(args);
+					break;
+				case "save":
+					CommandSave(args);
+					break;
+				case "load":
+					CommandLoad(args);
 					break;
 				default:
 					ClientAPI.ShowChatMessage(GetHelpMessage());
@@ -109,18 +107,28 @@ namespace CommandMacros {
 			}
 		}
 
+		/// <summary>
+		/// saves all aliases to disk
+		/// </summary>
+		/// <param name="args"></param>
+		private void CommandSave(CmdArgs args) {
+			Mod.SaveConfig();
+			ClientAPI.ShowChatMessage("Saved all aliases.");
+		}
+
+		/// <summary>
+		/// saves all aliases to disk
+		/// </summary>
+		/// <param name="args"></param>
+		private void CommandLoad(CmdArgs args) {
+			Mod.LoadConfig();
+			ClientAPI.ShowChatMessage("Loaded all aliases.");
+		}
+
 		public override string GetDescription() => base.GetDescription();
 
 		public override string GetHelpMessage() => base.GetHelpMessage();
 
 		public override string GetSyntax() => base.GetSyntax();
-
-		internal List<Alias> GetManagerAsList() {
-			var aliases = new List<Alias>(Aliases.Count);
-			for (int i = 0; i < Aliases.Count; i++) {
-				aliases.Add(Aliases[i]);
-			}
-			return aliases;
-		}
 	}
 }

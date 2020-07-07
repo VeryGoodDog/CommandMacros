@@ -10,7 +10,7 @@ namespace CommandMacros {
 		internal ICoreClientAPI ClientAPI;
 		internal IClientEventAPI EventAPI;
 		internal ILogger Logger;
-		internal AliasManager AliasMan;
+		internal AliasManager AliasMan => Configs.AliasMan;
 
 		public IClientPlayer Player;
 		public AliasCommandler AliasCommler;
@@ -27,14 +27,11 @@ namespace CommandMacros {
 			Logger = ClientAPI.Logger;
 
 			try {
-				Configs = LoadConfig();
+				LoadConfig();
 			} catch (Exception) {
 				Logger.Warning("alias config failed to load!");
+				Configs ??= new AliasConfig();
 			}
-
-			Configs ??= new AliasConfig();
-
-			AliasMan = Configs.AsAliasManager();
 
 			AliasCommler = new AliasCommandler(this);
 			ClientAPI.RegisterCommand(AliasCommler);
@@ -46,24 +43,25 @@ namespace CommandMacros {
 			};
 
 			EventAPI.LeaveWorld += () => {
-				Configs.aliases = AliasCommler.GetManagerAsList();
-				SaveConfig(Configs);
-				Logger.Debug("Saved alias config.");
+				SaveConfig();
+				
 			};
 			base.StartClientSide(api);
 		}
 
-		private AliasConfig LoadConfig() {
-			return ClientAPI.LoadModConfig<AliasConfig>(
+		internal void LoadConfig() {
+			Configs = ClientAPI.LoadModConfig<AliasConfig>(
 				ConfigPath
 			);
+			Logger.Debug("Loaded alias config.")
 		}
 
-		private void SaveConfig(AliasConfig conf) {
+		internal void SaveConfig() {
 			ClientAPI.StoreModConfig(
-				conf,
+				Configs,
 				ConfigPath
 			);
+			Logger.Debug("Saved alias config.");
 		}
 	}
 

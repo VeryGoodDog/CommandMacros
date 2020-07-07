@@ -4,7 +4,7 @@
     "description": "Allows binding macros to command aliases",
     "authors": [ "VeryGoodDog" ],
     "contributors": [],
-    "version": "0.0.4",
+    "version": "0.0.5",
     "side": "Client",
     "dependencies": {
         "game": "1.12.0"

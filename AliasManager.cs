@@ -11,18 +11,11 @@ namespace CommandMacros {
 
 		private readonly List<string> allTriggers = new List<string>();
 
-		public bool hasClient = false;
-		public bool allBound = false;
-		public bool IsReady => hasClient && allBound;
-
 		/// <summary>
 		/// Must be called before adding any commands.
 		/// </summary>
 		/// <param name="api"></param>
-		internal void Init(ICoreClientAPI api) {
-			ClientAPI = api;
-			hasClient = true;
-		}
+		internal void Init(ICoreClientAPI api) => ClientAPI = api;
 
 		public void AddOrUpdate(Alias al) {
 			RegisterTrigger(al.trigger);
@@ -47,7 +40,7 @@ namespace CommandMacros {
 		/// </summary>
 		/// <param name="al">the alias</param>
 		/// <param name="args">the command line args</param>
-		public void AliasCommand(Alias al, string[] args) {
+		private void AliasCommand(Alias al, string[] args) {
 			var comms = al.commands;
 			var injectedComms = new string[comms.Length];
 			try {
@@ -69,15 +62,9 @@ namespace CommandMacros {
 
 		internal void InitAllAliases(ICoreClientAPI api) {
 			Init(api);
-			allBound = true;
-			try {
-				for (int i = 0; i < Count; i++) {
-					RegisterTrigger(this[i].trigger);
-				}
-			} catch (Exception) {
-				allBound = false;
+			for (int i = 0; i < Count; i++) {
+				RegisterTrigger(this[i].trigger);
 			}
-
 		}
 
 		protected override string GetKeyForItem(Alias item) => item.trigger;

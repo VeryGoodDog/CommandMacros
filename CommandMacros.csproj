@@ -57,6 +57,10 @@
       <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSSurvivalMod.dll</HintPath>
       <Private>False</Private>
     </Reference>
+		<Reference Include="Newtonsoft.JSON">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="AliasMod.cs" />
