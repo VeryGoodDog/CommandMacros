@@ -53,7 +53,7 @@ namespace CommandMacros {
 			Configs = ClientAPI.LoadModConfig<AliasConfig>(
 				ConfigPath
 			);
-			Logger.Debug("Loaded alias config.")
+			Logger.Debug("Loaded alias config.");
 		}
 
 		internal void SaveConfig() {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 
 namespace CommandMacros {
 
@@ -20,7 +21,7 @@ namespace CommandMacros {
 		public AliasCommandler(AliasMod mod) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
-			Syntax = "[new|list|delete|save|load]";
+			Syntax = "[new|list|delete]";
 
 			Mod = mod;
 			ClientAPI = Mod.ClientAPI;
@@ -63,7 +64,7 @@ namespace CommandMacros {
 		/// <param name="args"></param>
 		private void CommandNew(CmdArgs args) {
 			if (args.Length < 2) {
-				ClientAPI.ShowChatMessage("You must specify at least 2 arguments.");
+				ClientAPI.ShowChatMessage(Lang.Get("needs-2-args"));
 				return;
 			}
 			var trigger = args.PopWord();
@@ -72,7 +73,7 @@ namespace CommandMacros {
 				args.PopAll().Split(';')
 				);
 			Aliases.AddOrUpdate(al);
-			ClientAPI.ShowChatMessage($"Created or edited an alias for {trigger}!");
+			ClientAPI.ShowChatMessage(Lang.Get("created-or-edited", trigger));
 		}
 
 		/// <summary>
@@ -81,14 +82,14 @@ namespace CommandMacros {
 		/// <param name="args"></param>
 		private void CommandDelete(CmdArgs args) {
 			if (args.Length < 1) {
-				ClientAPI.ShowChatMessage("You must specify at least 1 argument.");
+				ClientAPI.ShowChatMessage(Lang.Get("needs-1-arg"));
 				return;
 			}
 			var trigger = args.PopWord();
 			if (Aliases.Remove(trigger))
-				ClientAPI.ShowChatMessage($"Marked alias {trigger} for deletion");
+				ClientAPI.ShowChatMessage(Lang.Get("marked-deletion",trigger));
 			else
-				ClientAPI.ShowChatMessage($"No such alias {trigger}");
+				ClientAPI.ShowChatMessage(Lang.Get("no-alias", trigger));
 		}
 
 		/// <summary>
@@ -97,11 +98,11 @@ namespace CommandMacros {
 		/// <param name="args"></param>
 		private void CommandList(CmdArgs args) {
 			if (args.Length != 0 && Aliases.Contains(args.PeekWord())) {
-				ClientAPI.ShowChatMessage("You have an alias:");
+				ClientAPI.ShowChatMessage(Lang.Get("has-alias"));
 				ClientAPI.ShowChatMessage(Aliases[args.PeekWord()].ToString());
 				return;
 			}
-			ClientAPI.ShowChatMessage($"You have {Aliases.Count} aliases:");
+			ClientAPI.ShowChatMessage(Lang.Get("has-multiple-alias", Aliases.Count));
 			foreach (var al in Aliases) {
 				ClientAPI.ShowChatMessage(al.ToString());
 			}
@@ -113,7 +114,7 @@ namespace CommandMacros {
 		/// <param name="args"></param>
 		private void CommandSave(CmdArgs args) {
 			Mod.SaveConfig();
-			ClientAPI.ShowChatMessage("Saved all aliases.");
+			ClientAPI.ShowChatMessage(Lang.Get("saved-aliases"));
 		}
 
 		/// <summary>
@@ -122,7 +123,7 @@ namespace CommandMacros {
 		/// <param name="args"></param>
 		private void CommandLoad(CmdArgs args) {
 			Mod.LoadConfig();
-			ClientAPI.ShowChatMessage("Loaded all aliases.");
+			ClientAPI.ShowChatMessage(Lang.Get("loaded-aliases"));
 		}
 
 		public override string GetDescription() => base.GetDescription();

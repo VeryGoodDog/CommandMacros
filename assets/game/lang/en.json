@@ -1,0 +1,11 @@
+{
+	"needs-2-args": "You must specify at least 2 arguments.",
+	"created-or-edited": "Created or edited an alias for {0}!",
+	"needs-1-arg": "You must specify at least 1 argument.",
+	"marked-deletion": "Marked alias {0} for deletion.",
+	"no-alias": "No such alias {0}!",
+	"saved-aliases": "Saved all aliases.",
+	"loaded-aliases": "Loaded all aliases.",
+	"alias-command": "Alias command",
+	"arg-injection-failed": "Argument injection failed. You may need more arguments."
+}

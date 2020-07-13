@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 
 namespace CommandMacros {
 	public class AliasManager : KeyedCollection<string, Alias> {
@@ -25,7 +26,7 @@ namespace CommandMacros {
 
 		private void RegisterTrigger(string trigger) {
 			if (allTriggers.Contains(trigger)) return;
-			ClientAPI.RegisterCommand(trigger, "Alias command", "", (group, args) => {
+			ClientAPI.RegisterCommand(trigger, Lang.Get("alias-command"), "", (group, args) => {
 				var al = this[trigger];
 				if (al is null) return;
 				var allArgs = args.PopAllAsArray();
@@ -49,7 +50,7 @@ namespace CommandMacros {
 					injectedComms[i] = string.Format(line, args);
 				}
 			} catch (FormatException) {
-				ClientAPI.ShowChatMessage("Argument injection failed. You may need more arguments.");
+				ClientAPI.ShowChatMessage(Lang.Get("arg-injection-failed"));
 				return;
 			}
 

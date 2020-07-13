@@ -1,89 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>Library</OutputType>
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<OutputType>Library</OutputType>
 		<RootNamespace>CommandMacros</RootNamespace>
-    <AssemblyName>CommandMacros</AssemblyName>
+		<AssemblyName>CommandMacros</AssemblyName>
 		<ProjectGuid>{CD3EA34A-BD0D-4F9D-9B5F-11C40639FFD0}</ProjectGuid>
 		<SynchReleaseVersion>false</SynchReleaseVersion>
-  </PropertyGroup>
+	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug\CommandMacros</OutputPath>
+		<DefineConstants>DEBUG;</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<ConsolePause>false</ConsolePause>
+		<LangVersion>8.0</LangVersion>
+		<CustomCommands>
+			<CustomCommands>
+				<Command>
+					<type>AfterBuild</type>
+					<command>cp -Rf ./bin/Debug/ /Users/me/.config/VintagestoryData/Mods/</command>
+					<workingdir></workingdir>
+				</Command>
+			</CustomCommands>
+		</CustomCommands>
+	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <Optimize>true</Optimize>
-	  <LangVersion>8.0</LangVersion>
+		<Optimize>true</Optimize>
+		<LangVersion>8.0</LangVersion>
 		<OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>zip -rjD ./zip/CommandMacros.zip ./bin/Release/*</command>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<ConsolePause>false</ConsolePause>
+		<CustomCommands>
+			<CustomCommands>
+				<Command>
+					<type>AfterBuild</type>
+					<command>zip -rjD ./zip/CommandMacros.zip ./bin/Release/*</command>
+				</Command>
+			</CustomCommands>
+		</CustomCommands>
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="VintagestoryAPI">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\VintagestoryAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VintagestoryLib">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\VintagestoryLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSCreativeMod">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSCreativeMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSEssentials">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSEssentials.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VSSurvivalMod">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSSurvivalMod.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\VintagestoryAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VintagestoryLib">
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\VintagestoryLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSCreativeMod">
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSCreativeMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSEssentials">
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSEssentials.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSSurvivalMod">
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Mods\VSSurvivalMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="Newtonsoft.JSON">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Lib\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+			<HintPath>..\..\..\..\..\..\..\..\..\..\Applications\vintagestory.app\Lib\Newtonsoft.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="AliasMod.cs" />
-		<Compile Include="Properties\AssemblyInfo.cs" />
-		<Compile Include="SuperMacroCommandler.cs" />
-		<Compile Include="AliasCommandler.cs" />
-		<Compile Include="Configs.cs" />
-		<Compile Include="AliasManager.cs" />
-		<Compile Include="Alias.cs" />
+		<Compile Include="AliasMod.cs"/>
+		<Compile Include="Properties\AssemblyInfo.cs"/>
+		<Compile Include="SuperMacroCommandler.cs"/>
+		<Compile Include="AliasCommandler.cs"/>
+		<Compile Include="Configs.cs"/>
+		<Compile Include="AliasManager.cs"/>
+		<Compile Include="Alias.cs"/>
 	</ItemGroup>
-  <ItemGroup>
+	<ItemGroup>
+		<Folder Include="assets\"/>
+		<Folder Include="assets\game\"/>
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="modinfo.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="PrefixedHierarchical" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="assets\game\lang\en.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
+	<ProjectExtensions>
+		<MonoDevelop>
+			<Properties>
+				<Policies>
+					<DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="PrefixedHierarchical"/>
+				</Policies>
+			</Properties>
+		</MonoDevelop>
+	</ProjectExtensions>
 </Project>
