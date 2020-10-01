@@ -14,6 +14,7 @@ namespace CommandMacros {
 
 		/// <summary>
 		/// Must be called before adding any commands.
+		/// this is in its own method so deserialization works
 		/// </summary>
 		/// <param name="api"></param>
 		internal void Init(ICoreClientAPI api) => ClientAPI = api;
@@ -33,29 +34,21 @@ namespace CommandMacros {
 				AliasCommand(al, allArgs);
 			});
 			allTriggers.Add(trigger);
-
 		}
 
 		/// <summary>
-		/// this is what does the majority of the hard work.
+		/// this is what actually calls the injected comms.
 		/// </summary>
 		/// <param name="al">the alias</param>
 		/// <param name="args">the command line args</param>
 		private void AliasCommand(Alias al, string[] args) {
-			var comms = al.commands;
-			var injectedComms = new string[comms.Length];
-			try {
-				for (int i = 0; i < comms.Length; i++) {
-					var line = comms[i];
-					injectedComms[i] = string.Format(line, args);
-				}
-			} catch (FormatException) {
+			var injectedComms = al.Inject(args);
+			if (injectedComms is null) {
 				ClientAPI.ShowChatMessage(Lang.Get("arg-injection-failed"));
 				return;
 			}
-
 			for (int i = 0; i < injectedComms.Length; i++) {
-				ClientAPI.TriggerChatMessage(injectedComms[i]);
+				ClientAPI.SendChatMessage(injectedComms[i]);
 			}
 		}
 

@@ -37,14 +37,13 @@ namespace CommandMacros {
 			ClientAPI.RegisterCommand(AliasCommler);
 
 			EventAPI.LevelFinalize += () => {
-				Logger.VerboseDebug("Initializing aliases!");
+				Logger.Debug("Initializing aliases!");
 				Player = ClientAPI.World.Player;
 				AliasMan.InitAllAliases(ClientAPI);
 			};
 
 			EventAPI.LeaveWorld += () => {
 				SaveConfig();
-				
 			};
 			base.StartClientSide(api);
 		}

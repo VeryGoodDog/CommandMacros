@@ -17,7 +17,6 @@ namespace CommandMacros {
 		/// Create the command, a command handler... a Commandler, if you will. 
 		/// </summary>
 		/// <param name="mod"></param>
-		/// <param name="list">Alias list to keep a reference.</param>
 		public AliasCommandler(AliasMod mod) {
 			Command = "commandalias";
 			Description = "Create a command alias.";
@@ -125,11 +124,5 @@ namespace CommandMacros {
 			Mod.LoadConfig();
 			ClientAPI.ShowChatMessage(Lang.Get("loaded-aliases"));
 		}
-
-		public override string GetDescription() => base.GetDescription();
-
-		public override string GetHelpMessage() => base.GetHelpMessage();
-
-		public override string GetSyntax() => base.GetSyntax();
 	}
 }

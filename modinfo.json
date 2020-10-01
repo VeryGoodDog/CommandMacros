@@ -6,8 +6,5 @@
     "contributors": [],
     "version": "0.0.6",
     "side": "Client",
-    "dependencies": {
-        "game": "1.13"
-    },
     "website": "haha"
 }
