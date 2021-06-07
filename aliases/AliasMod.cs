@@ -1,6 +1,9 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using Microsoft.CSharp;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.Common;
@@ -10,14 +13,17 @@ namespace CommandMacros {
 		internal ICoreClientAPI ClientAPI;
 		internal IClientEventAPI EventAPI;
 		internal ILogger Logger;
-		internal AliasManager AliasMan => Configs.AliasMan;
+		public AliasManager AliasMan => Configs.AliasMan;
 
-		public IClientPlayer Player;
-		public AliasCommandler AliasCommler;
-		public AliasConfig Configs;
+		internal IClientPlayer Player;
+		internal AliasCommandler AliasCommler;
+		internal AliasConfig Configs;
 
+		private GuiDialog Editor;
 
-		public static string ConfigPath = Path.Combine("cmaliases.json");
+		public static readonly string CONFIG_PATH = "cmaliases.json";
+
+		public override bool AllowRuntimeReload => true;
 
 		public override bool ShouldLoad(EnumAppSide forSide) => forSide.IsClient();
 
@@ -26,39 +32,41 @@ namespace CommandMacros {
 			EventAPI = ClientAPI.Event;
 			Logger = ClientAPI.Logger;
 
-			try {
-				LoadConfig();
-			} catch (Exception) {
-				Logger.Warning("alias config failed to load!");
-				Configs ??= new AliasConfig();
-			}
+			LoadConfig();
 
 			AliasCommler = new AliasCommandler(this);
 			ClientAPI.RegisterCommand(AliasCommler);
 
-			EventAPI.LevelFinalize += () => {
-				Logger.Debug("Initializing aliases!");
-				Player = ClientAPI.World.Player;
-				AliasMan.InitAllAliases(ClientAPI);
-			};
 
-			EventAPI.LeaveWorld += () => {
-				SaveConfig();
-			};
-			base.StartClientSide(api);
+			Editor = new GuiDialogAliasEditor(ClientAPI);
+			ClientAPI.Gui.RegisterDialog(Editor);
+
+			// ClientAPI.Input.RegisterHotKey("opencmeditor", "Open CommandMacro editor", GlKeys.O);
+			// ClientAPI.Input.SetHotKeyHandler("opencmeditor", combo => {
+			// 	Editor.TryOpen();
+			// 	return true;
+			// });
+
+			Logger.Debug("Initializing aliases!");
+			Player = ClientAPI.World.Player;
+			AliasMan.InitAllAliases(ClientAPI);
+
+			EventAPI.LeaveWorld += SaveConfig;
 		}
 
 		internal void LoadConfig() {
 			Configs = ClientAPI.LoadModConfig<AliasConfig>(
-				ConfigPath
+				CONFIG_PATH
 			);
+			if (Configs is null)
+				Configs ??= new AliasConfig();
 			Logger.Debug("Loaded alias config.");
 		}
 
 		internal void SaveConfig() {
 			ClientAPI.StoreModConfig(
 				Configs,
-				ConfigPath
+				CONFIG_PATH
 			);
 			Logger.Debug("Saved alias config.");
 		}
@@ -74,4 +82,3 @@ namespace CommandMacros {
 		}
 	}
 }
-

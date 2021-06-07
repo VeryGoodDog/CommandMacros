@@ -48,7 +48,8 @@ namespace CommandMacros {
 				return;
 			}
 			for (int i = 0; i < injectedComms.Length; i++) {
-				ClientAPI.SendChatMessage(injectedComms[i]);
+				// this is the single most important line in this whole mod.
+				ClientAPI.TriggerChatMessage(injectedComms[i]);
 			}
 		}
 

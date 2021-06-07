@@ -6,9 +6,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 
 namespace CommandMacros {
-
 	public class AliasCommandler : ClientChatCommand {
-
 		private readonly AliasMod Mod;
 		private readonly ICoreClientAPI ClientAPI;
 		internal AliasManager Aliases => Mod.AliasMan;
@@ -18,7 +16,7 @@ namespace CommandMacros {
 		/// </summary>
 		/// <param name="mod"></param>
 		public AliasCommandler(AliasMod mod) {
-			Command = "commandalias";
+			Command = "cmdalias";
 			Description = "Create a command alias.";
 			Syntax = "[new|list|delete]";
 
@@ -37,8 +35,10 @@ namespace CommandMacros {
 
 			switch (opt) {
 				case "new":
+				case "add":
 					CommandNew(args);
 					break;
+				case "l":
 				case "list":
 					CommandList(args);
 					break;
@@ -66,11 +66,13 @@ namespace CommandMacros {
 				ClientAPI.ShowChatMessage(Lang.Get("needs-2-args"));
 				return;
 			}
+
+			Console.WriteLine("Creating alias!");
 			var trigger = args.PopWord();
 			var al = new Alias(
 				trigger,
 				args.PopAll().Split(';')
-				);
+			);
 			Aliases.AddOrUpdate(al);
 			ClientAPI.ShowChatMessage(Lang.Get("created-or-edited", trigger));
 		}
@@ -84,9 +86,10 @@ namespace CommandMacros {
 				ClientAPI.ShowChatMessage(Lang.Get("needs-1-arg"));
 				return;
 			}
+
 			var trigger = args.PopWord();
 			if (Aliases.Remove(trigger))
-				ClientAPI.ShowChatMessage(Lang.Get("marked-deletion",trigger));
+				ClientAPI.ShowChatMessage(Lang.Get("marked-deletion", trigger));
 			else
 				ClientAPI.ShowChatMessage(Lang.Get("no-alias", trigger));
 		}
@@ -117,7 +120,7 @@ namespace CommandMacros {
 		}
 
 		/// <summary>
-		/// saves all aliases to disk
+		/// loads all aliases from disk
 		/// </summary>
 		/// <param name="args"></param>
 		private void CommandLoad(CmdArgs args) {

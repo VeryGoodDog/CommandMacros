@@ -2,12 +2,12 @@
 CommandMacros is a simple mod that allows you to do more, faster!
 
 ### Current Features
-- Creating aliases via the `.commandalias` command. (`.commandalias` supports CRUD operations)
-`.commandalias new h .help` creates an alias for `.help` under `.h`.
+- Creating aliases via the `.cmdalias` command. (`.cmdalias` supports CRUD operations)
+`.cmdalias new h .help` creates an alias for `.help` under `.h`.
 - Running multiple commands in one alias, separated by semicolons.
-`.commandalias new twothings .help;.edi`
+`.cmdalias new twothings .help;.edi`
 - Supplying arguments to an alias.
-`.commandalias new onetwo {0} {1};{1} {0}` registers `onetwo` so `.onetwo one two` prints `one two` and `two one` to chat.
+`.cmdalias new onetwo {0} {1};{1} {0}` registers `onetwo` so `.onetwo one two` prints `one two` and `two one` to chat.
 
 ### Planned Features
 - Rest arguments.
