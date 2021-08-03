@@ -7,7 +7,6 @@ using Vintagestory.API.Config;
 
 namespace CommandMacros {
 	public class AliasManager : KeyedCollection<string, Alias> {
-
 		private ICoreClientAPI ClientAPI = null;
 
 		private readonly List<string> allTriggers = new List<string>();
@@ -26,10 +25,12 @@ namespace CommandMacros {
 		}
 
 		private void RegisterTrigger(string trigger) {
-			if (allTriggers.Contains(trigger)) return;
+			if (allTriggers.Contains(trigger))
+				return;
 			ClientAPI.RegisterCommand(trigger, Lang.Get("alias-command"), "", (group, args) => {
 				var al = this[trigger];
-				if (al is null) return;
+				if (al is null)
+					return;
 				var allArgs = args.PopAllAsArray();
 				AliasCommand(al, allArgs);
 			});
@@ -49,8 +50,15 @@ namespace CommandMacros {
 			}
 			for (int i = 0; i < injectedComms.Length; i++) {
 				// this is the single most important line in this whole mod.
-				ClientAPI.TriggerChatMessage(injectedComms[i]);
+				SendChatLine(injectedComms[i]);
 			}
+		}
+
+		private void SendChatLine(string line) {
+			if (line.StartsWith("."))
+				ClientAPI.TriggerChatMessage(line);
+			else
+				ClientAPI.SendChatMessage(line);
 		}
 
 		public new bool Remove(Alias al) => Remove(al.trigger);

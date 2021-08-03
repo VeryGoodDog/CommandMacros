@@ -14,7 +14,7 @@ namespace CommandMacros {
 		/// <summary>
 		/// Create the command, a command handler... a Commandler, if you will. 
 		/// </summary>
-		/// <param name="mod"></param>
+		/// <param name="mod">Parent mod</param>
 		public AliasCommandler(AliasMod mod) {
 			Command = "cmdalias";
 			Description = "Create a command alias.";
@@ -25,7 +25,7 @@ namespace CommandMacros {
 		}
 
 		public override void CallHandler(IPlayer player, int groupId, CmdArgs args) {
-			// ClientAPI.SendChatMessage("Plonk!"); :)
+			// ClientAPI.SendChatMessage("Plonk!");
 			if (args.Length == 0) {
 				ClientAPI.ShowChatMessage(GetHelpMessage());
 				return;
@@ -46,10 +46,10 @@ namespace CommandMacros {
 					CommandDelete(args);
 					break;
 				case "save":
-					CommandSave(args);
+					CommandSave();
 					break;
 				case "load":
-					CommandLoad(args);
+					CommandLoad();
 					break;
 				default:
 					ClientAPI.ShowChatMessage(GetHelpMessage());
@@ -60,7 +60,6 @@ namespace CommandMacros {
 		/// <summary>
 		/// Create a new alias.
 		/// </summary>
-		/// <param name="args"></param>
 		private void CommandNew(CmdArgs args) {
 			if (args.Length < 2) {
 				ClientAPI.ShowChatMessage(Lang.Get("needs-2-args"));
@@ -80,7 +79,6 @@ namespace CommandMacros {
 		/// <summary>
 		/// Deletes an alias.
 		/// </summary>
-		/// <param name="args"></param>
 		private void CommandDelete(CmdArgs args) {
 			if (args.Length < 1) {
 				ClientAPI.ShowChatMessage(Lang.Get("needs-1-arg"));
@@ -97,14 +95,13 @@ namespace CommandMacros {
 		/// <summary>
 		/// Lists aliases, or prints one alias.
 		/// </summary>
-		/// <param name="args"></param>
 		private void CommandList(CmdArgs args) {
 			if (args.Length != 0 && Aliases.Contains(args.PeekWord())) {
 				ClientAPI.ShowChatMessage(Lang.Get("has-alias"));
 				ClientAPI.ShowChatMessage(Aliases[args.PeekWord()].ToString());
 				return;
 			}
-			ClientAPI.ShowChatMessage(Lang.Get("has-multiple-alias", Aliases.Count));
+			ClientAPI.ShowChatMessage(Lang.Get("has-multiple-alias"));
 			foreach (var al in Aliases) {
 				ClientAPI.ShowChatMessage(al.ToString());
 			}
@@ -113,8 +110,7 @@ namespace CommandMacros {
 		/// <summary>
 		/// saves all aliases to disk
 		/// </summary>
-		/// <param name="args"></param>
-		private void CommandSave(CmdArgs args) {
+		private void CommandSave() {
 			Mod.SaveConfig();
 			ClientAPI.ShowChatMessage(Lang.Get("saved-aliases"));
 		}
@@ -122,8 +118,7 @@ namespace CommandMacros {
 		/// <summary>
 		/// loads all aliases from disk
 		/// </summary>
-		/// <param name="args"></param>
-		private void CommandLoad(CmdArgs args) {
+		private void CommandLoad() {
 			Mod.LoadConfig();
 			ClientAPI.ShowChatMessage(Lang.Get("loaded-aliases"));
 		}

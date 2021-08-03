@@ -7,5 +7,6 @@
 	"saved-aliases": "Saved all aliases.",
 	"loaded-aliases": "Loaded all aliases.",
 	"alias-command": "Alias command",
-	"arg-injection-failed": "Argument injection failed. You may need more arguments."
+	"arg-injection-failed": "Argument injection failed. You may need more arguments.",
+	"has-multiple-alias": "You have these aliases:"
 }

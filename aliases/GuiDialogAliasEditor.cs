@@ -12,14 +12,14 @@ namespace CommandMacros {
 		private List<ListCellEntry> cellList = new List<ListCellEntry>();
 		private GuiElementTextArea textArea;
 		private int selectedCellIndex = -1;
+		private GuiElementTextInput textInput;
 
 		public GuiDialogAliasEditor(ICoreClientAPI capi) : base(capi) {
 			AliasMan = capi.ModLoader.GetModSystem<AliasMod>().AliasMan;
 		}
 
-		
+
 		private void LoadAliases() {
-			Console.WriteLine("LoadAliases");
 			cellList.Clear();
 			foreach (var alias in AliasMan) {
 				cellList.Add(new ListCellEntry() {
@@ -33,24 +33,36 @@ namespace CommandMacros {
 		public override string ToggleKeyCombinationCode => "opencmeditor";
 
 		private void ComposeDialog() {
-			Console.WriteLine("ComposeDialog");
-
-			int height = 300; 
+			int height = 200;
 			int tableWidth = 150;
 			int textAreaWidth = 200;
+			int headerHeight = 20;
+			int labelWidth = 60;
 
 			var spacer = ElementStdBounds
 				.TitleBar();
 
 			var tableBounds = Fixed(0, 0, tableWidth, height);
 
+			var labelBounds = Fixed(0, 0, labelWidth, headerHeight);
+
+			var nameInputBounds = Fixed(labelWidth, 0, textAreaWidth - labelWidth, headerHeight);
+
+			var headerBounds = Fixed(0, 0, textAreaWidth, headerHeight)
+				.WithChildren(labelBounds, nameInputBounds);
+
 			var textAreaBounds = Fixed(0, 0, textAreaWidth, height)
-				.FixedRightOf(tableBounds, HalfPadding);
+				.FixedUnder(headerBounds, HalfPadding);
+
+			var textContainerBounds = Fill
+				.WithSizing(ElementSizing.FitToChildren)
+				.FixedRightOf(tableBounds, HalfPadding)
+				.WithChildren(textAreaBounds, headerBounds);
 
 			var bodyBounds = Fill
 				.WithSizing(ElementSizing.FitToChildren)
 				.FixedUnder(spacer)
-				.WithChildren(textAreaBounds, tableBounds);
+				.WithChildren(textContainerBounds, tableBounds);
 
 			var bgBounds = Fill
 				.WithFixedPadding(ElementToDialogPadding)
@@ -61,19 +73,21 @@ namespace CommandMacros {
 				.AutosizedMainDialog
 				.WithAlignment(EnumDialogArea.CenterMiddle);
 
-
 			SingleComposer = capi.Gui.CreateCompo("aliaseditor", dialogBounds)
 				.AddShadedDialogBG(bgBounds)
 				.AddDialogTitleBar("Alias Editor", () => TryClose())
-				.AddTextArea(textAreaBounds, OnTextChanged, CairoFont.TextInput(), "aliastextarea")
+				.AddStaticText("Alias:", CairoFont.WhiteSmallishText(), labelBounds)
+				.AddTextInput(nameInputBounds, OnAliasNameChanged, CairoFont.TextInput(), "aliastextinput")
+				.AddTextArea(textAreaBounds, OnAliasTextChanged, CairoFont.TextInput(), "aliastextarea")
 				.AddCellList(tableBounds,
 					(cell, elBounds) => new GuiElementCell(capi, cell, elBounds) {ShowModifyIcons = false},
 					OnMouseDownOnCell, OnMouseDownOnCell,
 					cellList, "aliascellarea")
 				.Compose();
 			textArea = SingleComposer.GetTextArea("aliastextarea");
+			textArea.Enabled = false;
+			textInput = SingleComposer.GetTextInput("aliastextinput");
 		}
-
 
 		private void OnMouseDownOnCell(int cellIndex) {
 			if (cellIndex == selectedCellIndex)
@@ -85,12 +99,7 @@ namespace CommandMacros {
 			textArea.Enabled = true;
 		}
 
-		private void a(int c) {
-			OnMouseDownOnCell(c);
-		}
-
 		public override void OnGuiOpened() {
-			Console.WriteLine("OnGuiOpened");
 			LoadAliases();
 			try {
 				ComposeDialog();
@@ -101,12 +110,13 @@ namespace CommandMacros {
 		}
 
 		public override void OnGuiClosed() {
-			Console.WriteLine("OnGuiClosed");
-			SingleComposer.Dispose();
+			SingleComposer?.Dispose();
 		}
 
-		private void OnTextChanged(string text) {
+		private void OnAliasTextChanged(string text) {
 			// do something :)
 		}
+		
+		private void OnAliasNameChanged(string newName) { }
 	}
 }

@@ -27,6 +27,9 @@ namespace CommandMacros {
 
 		public override bool ShouldLoad(EnumAppSide forSide) => forSide.IsClient();
 
+		public override double ExecuteOrder() => .1;
+
+
 		public override void StartClientSide(ICoreClientAPI api) {
 			ClientAPI = api;
 			EventAPI = ClientAPI.Event;
@@ -50,7 +53,7 @@ namespace CommandMacros {
 			Logger.Debug("Initializing aliases!");
 			Player = ClientAPI.World.Player;
 			AliasMan.InitAllAliases(ClientAPI);
-
+			
 			EventAPI.LeaveWorld += SaveConfig;
 		}
 
